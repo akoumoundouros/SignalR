@@ -1,0 +1,84 @@
+﻿@{ Layout = null; }
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.signalR-2.2.3.js"></script>
+<script src="/signalr/hubs"></script>
+<link rel="stylesheet" href="~/Content/bootstrap.css" />
+<link rel="stylesheet" href="~/Content/site.css" />
+
+
+<script type="text/javascript">
+    var connection = $.hubConnection();
+    var chatHub = $.connection.ChatHub;
+    chatHub.on('addNewMessageToPage', function (response) {
+        var msg = response.UserName + ': ' + response.Message;
+        var txt = $("#chatBox").val();
+        $("#chatBox").html(txt + "\n" + msg);
+    });
+    chatHub.connection.start()
+        .done(function () {
+            //chatHub.server.RegisterGroup("Group1");
+            chatHub.server.registerClient("Group1");
+            console.log('Now connected, connection ID=' + chatHub.connection.id);
+            $("#chatBox").html('Now connected, connection ID=' + chatHub.connection.id);
+            $('#sendBtn').click(function () {
+                chatHub.server.sendMessage($('#displayName').val(), $('#message').val());
+                $('#message').val('').focus();
+            });
+        })
+        .fail(function () { console.log('Could not connect'); });
+
+    $(document).ready(() => {
+        $("#message").keyup(function (event) {
+            if (event.keyCode === 13) {
+                $("#sendBtn").click();
+            }
+        });
+    })
+</script>
+
+<style>
+    #chatBox{
+        width: 100%;
+        
+    }
+</style>
+
+<div class="jumbotron">
+    <h1>Chat Hub</h1>
+    <div class="row col-xs-12">
+        <div class="form-group row">
+            <div class="col-xs-6"><textarea rows="4" cols="100" id="chatBox"></textarea></div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-1"><label>Name</label></div>
+            <div class="col-xs-11"><input type="text" id="displayName" name="displayname" class="form-inline" /></div>
+        </div>
+        <div class="form-group row">
+            <div class="col-xs-1"><label>Message</label></div>
+            <div class="col-xs-4"><input type="text" id="message" name="message" class="form-inline" /><button type="submit" value="send" class="btn btn-success form-inline" id="sendBtn" accesskey="">Send</button></div>
+            
+        </div>
+    </div>
+    <div class="col-xs-6"></div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+            is an ideal platform for building RESTful applications on the .NET Framework.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    </div>
+</div>
